@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const express = require('express')
 const cors = require('cors')
 const cookieparser = require('cookie-parser')
@@ -7,28 +9,27 @@ const emailValidator = require('node-email-verifier')
 const bcrypt = require('bcrypt')
 
 // config
-const PORT = 3000;
-const HOST = 'localhost'
-const JWT_SECRET = 'valami_jelszo'
-const JWT_EXPIRES_IN = '7d'
+const PORT = process.env.PORT;
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
 const COOKIE_NAME = 'auth-token'
 
 // cookie beállítás
 const COOKIE_OPTS = {
     httpOnly: true,
-    secure: false,
-    sameSite: 'lax',
+    secure: true,
+    sameSite: 'none',
     path: '/',
     maxAge: 7 * 24 * 60 * 60 * 1000,
 }
 
 // adatbázis beállítás
 const db = mysql.createPool({
-    host: 'localhost',
-    port: '3306',
-    user: 'root',
-    password: '',
-    database: 'project'
+    host: process.env.HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
 })
 
 // APP
@@ -189,7 +190,11 @@ app.post('/login', async (req, res) => {
 
 // KIJELENTKEZÉS
 app.post('/logout', auth, async (req, res) => {
-    res.clearCookie(COOKIE_NAME, { path: '/' });
+    res.clearCookie(COOKIE_NAME, { 
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        path: '/' });
     res.status(200).json({ message: "Logout successful" })
 })
 
@@ -1020,6 +1025,6 @@ app.put('/notifications/read-all', auth, async (req, res) => {
 
 
 // SZERVER INDÍTÁSA
-app.listen(PORT, HOST, () => {
+app.listen(PORT, () => {
     console.log(`API fut: http://${HOST}:${PORT}/`)
 })
