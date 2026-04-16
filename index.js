@@ -6,7 +6,7 @@ const cookieparser = require('cookie-parser')
 const mysql = require('mysql2/promise')
 const jwt = require('jsonwebtoken')
 const emailValidator = require('node-email-verifier')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 
 // config
 const PORT = process.env.PORT;
@@ -25,7 +25,7 @@ const COOKIE_OPTS = {
 
 // adatbázis beállítás
 const db = mysql.createPool({
-    host: process.env.HOST,
+    host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
@@ -38,10 +38,8 @@ const app = express();
 app.use(express.json())
 app.use(cookieparser())
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: '*',
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
 }))
 
 // Middleware
@@ -1026,5 +1024,5 @@ app.put('/notifications/read-all', auth, async (req, res) => {
 
 // SZERVER INDÍTÁSA
 app.listen(PORT, () => {
-    console.log(`API fut: http://${HOST}:${PORT}/`)
+    console.log(`API fut: http://localhost:${PORT}/`)
 })
