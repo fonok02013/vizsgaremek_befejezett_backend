@@ -281,65 +281,64 @@ app.put('/password', auth, async (req, res) => {
     }
 })
 
-// FELHASZNÁLÓ TÖRLÉSE (IDEgen kulcsokkal)
+// FELHASZNÁLÓ TÖRLÉSE (adatbázis idegen kulcsok nélkül)
 app.delete('/account', auth, async (req, res) => {
     const connection = await db.getConnection()
-
+    
     try {
         await connection.beginTransaction()
-
-        // 1. Értesítések törlése (hivatkozik a user_id-ra)
+        
+        // 1. Értesítések törlése
         await connection.query('DELETE FROM notifications WHERE user_id = ?', [req.user.id])
-
-        // 2. Market_offers törlése (két helyen is hivatkozhat)
-        //    a) ahol a felhasználó ajánlott (offered_user_card_id -> user_cards -> user_id)
+        
+        // 2. Market_offers törlése (ahol a felhasználó ajánlott)
         await connection.query(`
             DELETE mo FROM market_offers mo
             INNER JOIN user_cards uc ON mo.offered_user_card_id = uc.id
             WHERE uc.user_id = ?
         `, [req.user.id])
-
-        //    b) ahol a felhasználó listingjére érkezett ajánlat (listing_id -> market_listings -> user_cards -> user_id)
+        
+        // 3. Market_offers törlése (ahol a felhasználó listingjére érkezett ajánlat)
         await connection.query(`
             DELETE mo FROM market_offers mo
             INNER JOIN market_listings ml ON mo.listing_id = ml.id
             INNER JOIN user_cards uc ON ml.user_card_id = uc.id
             WHERE uc.user_id = ?
         `, [req.user.id])
-
-        // 3. Market_listings törlése (hivatkozik a user_card_id-ra)
+        
+        // 4. Market_listings törlése
         await connection.query(`
             DELETE ml FROM market_listings ml
             INNER JOIN user_cards uc ON ml.user_card_id = uc.id
             WHERE uc.user_id = ?
         `, [req.user.id])
-
-        // 4. User_cards törlése (hivatkozik a user_id-ra)
+        
+        // 5. User_cards törlése
         await connection.query('DELETE FROM user_cards WHERE user_id = ?', [req.user.id])
-
-        // 5. User_packs törlése (hivatkozik a user_id-ra)
+        
+        // 6. User_packs törlése
         await connection.query('DELETE FROM user_packs WHERE user_id = ?', [req.user.id])
-
-        // 6. Végül a felhasználó törlése
+        
+        // 7. Végül a felhasználó törlése
         const [result] = await connection.query('DELETE FROM users WHERE id = ?', [req.user.id])
-
+        
         if (result.affectedRows === 0) {
             await connection.rollback()
             return res.status(404).json({ message: "User not found" })
         }
-
+        
         await connection.commit()
-
+        
         // Cookie törlése
-        res.clearCookie(COOKIE_NAME, {
+        res.clearCookie(COOKIE_NAME, { 
             httpOnly: true,
             secure: true,
             sameSite: 'none',
-            path: '/'
+            path: '/' 
         })
-
+        
         res.status(200).json({ message: "Account successfully deleted" })
-
+        
     } catch (error) {
         await connection.rollback()
         console.error("Error deleting account:", error)
