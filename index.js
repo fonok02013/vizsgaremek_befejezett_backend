@@ -281,12 +281,15 @@ app.put('/password', auth, async (req, res) => {
     }
 })
 
-// FELHASZNÁLÓ TÖRLÉSE (adatbázis idegen kulcsok nélkül)
+// FELHASZNÁLÓ TÖRLÉSE (foreign key ellenőrzés kikapcsolásával)
 app.delete('/account', auth, async (req, res) => {
     const connection = await db.getConnection()
     
     try {
         await connection.beginTransaction()
+        
+        // Foreign key ellenőrzés kikapcsolása
+        await connection.query('SET FOREIGN_KEY_CHECKS = 0')
         
         // 1. Értesítések törlése
         await connection.query('DELETE FROM notifications WHERE user_id = ?', [req.user.id])
@@ -322,6 +325,9 @@ app.delete('/account', auth, async (req, res) => {
         // 7. Végül a felhasználó törlése
         const [result] = await connection.query('DELETE FROM users WHERE id = ?', [req.user.id])
         
+        // Foreign key ellenőrzés visszakapcsolása
+        await connection.query('SET FOREIGN_KEY_CHECKS = 1')
+        
         if (result.affectedRows === 0) {
             await connection.rollback()
             return res.status(404).json({ message: "User not found" })
@@ -341,6 +347,8 @@ app.delete('/account', auth, async (req, res) => {
         
     } catch (error) {
         await connection.rollback()
+        // Biztonság kedvéért kapcsoljuk vissza
+        await connection.query('SET FOREIGN_KEY_CHECKS = 1')
         console.error("Error deleting account:", error)
         res.status(500).json({ message: "Server error: " + error.message })
     } finally {
