@@ -38,7 +38,7 @@ const app = express();
 app.use(express.json())
 app.use(cookieparser())
 app.use(cors({
-    origin: '*',
+    origin: ['http://localhost:5173','https://mycarcards.netlify.app'],
     credentials: true,
 }))
 
@@ -188,12 +188,11 @@ app.post('/login', async (req, res) => {
 
 // KIJELENTKEZÉS
 app.post('/logout', auth, async (req, res) => {
-    res.clearCookie(COOKIE_NAME, {
+    res.clearCookie(COOKIE_NAME, { 
         httpOnly: true,
         secure: true,
         sameSite: 'none',
-        path: '/'
-    });
+        path: '/' });
     res.status(200).json({ message: "Logout successful" })
 })
 
@@ -281,52 +280,19 @@ app.put('/password', auth, async (req, res) => {
     }
 })
 
-// FELHASZNÁLÓ TÖRLÉSE (foreign key ellenőrzés kikapcsolásával)
+// FELHASZNÁLÓ TÖRLÉSE
 app.delete('/account', auth, async (req, res) => {
     const connection = await db.getConnection()
     
     try {
         await connection.beginTransaction()
-        
-        // Foreign key ellenőrzés kikapcsolása
-        await connection.query('SET FOREIGN_KEY_CHECKS = 0')
-        
-        // 1. Értesítések törlése
         await connection.query('DELETE FROM notifications WHERE user_id = ?', [req.user.id])
-        
-        // 2. Market_offers törlése (ahol a felhasználó ajánlott)
-        await connection.query(`
-            DELETE mo FROM market_offers mo
-            INNER JOIN user_cards uc ON mo.offered_user_card_id = uc.id
-            WHERE uc.user_id = ?
-        `, [req.user.id])
-        
-        // 3. Market_offers törlése (ahol a felhasználó listingjére érkezett ajánlat)
-        await connection.query(`
-            DELETE mo FROM market_offers mo
-            INNER JOIN market_listings ml ON mo.listing_id = ml.id
-            INNER JOIN user_cards uc ON ml.user_card_id = uc.id
-            WHERE uc.user_id = ?
-        `, [req.user.id])
-        
-        // 4. Market_listings törlése
-        await connection.query(`
-            DELETE ml FROM market_listings ml
-            INNER JOIN user_cards uc ON ml.user_card_id = uc.id
-            WHERE uc.user_id = ?
-        `, [req.user.id])
-        
-        // 5. User_cards törlése
+        await connection.query('DELETE FROM market_offers WHERE offered_user_card_id IN (SELECT id FROM user_cards WHERE user_id = ?)', [req.user.id])
+        await connection.query('DELETE FROM market_offers WHERE listing_id IN (SELECT id FROM market_listings WHERE user_card_id IN (SELECT id FROM user_cards WHERE user_id = ?))', [req.user.id])
+        await connection.query('DELETE FROM market_listings WHERE user_card_id IN (SELECT id FROM user_cards WHERE user_id = ?)', [req.user.id])
         await connection.query('DELETE FROM user_cards WHERE user_id = ?', [req.user.id])
-        
-        // 6. User_packs törlése
         await connection.query('DELETE FROM user_packs WHERE user_id = ?', [req.user.id])
-        
-        // 7. Végül a felhasználó törlése
         const [result] = await connection.query('DELETE FROM users WHERE id = ?', [req.user.id])
-        
-        // Foreign key ellenőrzés visszakapcsolása
-        await connection.query('SET FOREIGN_KEY_CHECKS = 1')
         
         if (result.affectedRows === 0) {
             await connection.rollback()
@@ -347,8 +313,6 @@ app.delete('/account', auth, async (req, res) => {
         
     } catch (error) {
         await connection.rollback()
-        // Biztonság kedvéért kapcsoljuk vissza
-        await connection.query('SET FOREIGN_KEY_CHECKS = 1')
         console.error("Error deleting account:", error)
         res.status(500).json({ message: "Server error: " + error.message })
     } finally {
