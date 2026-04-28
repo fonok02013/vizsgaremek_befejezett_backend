@@ -38,7 +38,7 @@ const app = express();
 app.use(express.json())
 app.use(cookieparser())
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://mycarcards.netlify.app'],
+    origin: ['http://localhost:5173','https://mycarcards.netlify.app'],
     credentials: true,
 }))
 
@@ -188,12 +188,11 @@ app.post('/login', async (req, res) => {
 
 // KIJELENTKEZÉS
 app.post('/logout', auth, async (req, res) => {
-    res.clearCookie(COOKIE_NAME, {
+    res.clearCookie(COOKIE_NAME, { 
         httpOnly: true,
         secure: true,
         sameSite: 'none',
-        path: '/'
-    });
+        path: '/' });
     res.status(200).json({ message: "Logout successful" })
 })
 
@@ -284,7 +283,7 @@ app.put('/password', auth, async (req, res) => {
 // FELHASZNÁLÓ TÖRLÉSE
 app.delete('/account', auth, async (req, res) => {
     const connection = await db.getConnection()
-
+    
     try {
         await connection.beginTransaction()
         await connection.query('DELETE FROM notifications WHERE user_id = ?', [req.user.id])
@@ -294,24 +293,24 @@ app.delete('/account', auth, async (req, res) => {
         await connection.query('DELETE FROM user_cards WHERE user_id = ?', [req.user.id])
         await connection.query('DELETE FROM user_packs WHERE user_id = ?', [req.user.id])
         const [result] = await connection.query('DELETE FROM users WHERE id = ?', [req.user.id])
-
+        
         if (result.affectedRows === 0) {
             await connection.rollback()
             return res.status(404).json({ message: "User not found" })
         }
-
+        
         await connection.commit()
-
+        
         // Cookie törlése
-        res.clearCookie(COOKIE_NAME, {
+        res.clearCookie(COOKIE_NAME, { 
             httpOnly: true,
             secure: true,
             sameSite: 'none',
-            path: '/'
+            path: '/' 
         })
-
+        
         res.status(200).json({ message: "Account successfully deleted" })
-
+        
     } catch (error) {
         await connection.rollback()
         console.error("Error deleting account:", error)

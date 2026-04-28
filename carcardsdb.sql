@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
--- Gép: 127.0.0.1
--- Létrehozás ideje: 2026. Ápr 16. 00:37
--- Kiszolgáló verziója: 10.4.32-MariaDB
--- PHP verzió: 8.2.12
+-- Gép: 192.168.255.103
+-- Létrehozás ideje: 2026. Ápr 28. 12:28
+-- Kiszolgáló verziója: 11.4.7-MariaDB-log
+-- PHP verzió: 8.4.11
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,8 +18,10 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Adatbázis: `project`
+-- Adatbázis: `carcardsdb`
 --
+CREATE DATABASE IF NOT EXISTS `carcardsdb` DEFAULT CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci;
+USE `carcardsdb`;
 
 -- --------------------------------------------------------
 
@@ -27,6 +29,7 @@ SET time_zone = "+00:00";
 -- Tábla szerkezet ehhez a táblához `cards`
 --
 
+DROP TABLE IF EXISTS `cards`;
 CREATE TABLE `cards` (
   `id` int(10) UNSIGNED NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -105,6 +108,7 @@ INSERT INTO `cards` (`id`, `name`, `manufacturer`, `image_url`, `fuel`, `gearbox
 -- Tábla szerkezet ehhez a táblához `market_listings`
 --
 
+DROP TABLE IF EXISTS `market_listings`;
 CREATE TABLE `market_listings` (
   `id` int(11) NOT NULL,
   `user_card_id` int(11) NOT NULL,
@@ -116,29 +120,8 @@ CREATE TABLE `market_listings` (
 --
 
 INSERT INTO `market_listings` (`id`, `user_card_id`, `status`) VALUES
-(1, 1, 'cancelled'),
-(2, 2, 'cancelled'),
-(3, 3, 'cancelled'),
-(4, 4, 'cancelled'),
-(5, 4, 'cancelled'),
-(6, 8, 'cancelled'),
-(7, 6, 'cancelled'),
-(8, 7, 'cancelled'),
-(9, 5, 'cancelled'),
-(10, 9, 'cancelled'),
-(11, 5, 'cancelled'),
-(12, 7, 'cancelled'),
-(13, 13, 'traded'),
-(14, 2, 'traded'),
-(15, 1, 'traded'),
-(16, 6, 'traded'),
-(17, 7, 'traded'),
-(18, 9, 'traded'),
-(19, 8, 'cancelled'),
-(20, 1, 'traded'),
-(21, 19, 'traded'),
-(26, 40, 'active'),
-(27, 36, 'active');
+(59, 173, 'traded'),
+(62, 182, 'cancelled');
 
 -- --------------------------------------------------------
 
@@ -146,6 +129,7 @@ INSERT INTO `market_listings` (`id`, `user_card_id`, `status`) VALUES
 -- Tábla szerkezet ehhez a táblához `market_offers`
 --
 
+DROP TABLE IF EXISTS `market_offers`;
 CREATE TABLE `market_offers` (
   `id` int(11) NOT NULL,
   `listing_id` int(11) NOT NULL,
@@ -154,33 +138,13 @@ CREATE TABLE `market_offers` (
   `status` enum('pending','accepted','rejected') DEFAULT 'pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- A tábla adatainak kiíratása `market_offers`
---
-
-INSERT INTO `market_offers` (`id`, `listing_id`, `offered_user_card_id`, `created_at`, `status`) VALUES
-(1, 8, 10, '2026-03-17 22:12:32', 'rejected'),
-(2, 8, 13, '2026-03-22 15:35:31', 'rejected'),
-(3, 8, 14, '2026-03-22 15:35:35', 'rejected'),
-(4, 14, 9, '2026-03-22 15:40:06', 'accepted'),
-(5, 15, 5, '2026-03-22 15:47:54', 'accepted'),
-(6, 13, 8, '2026-03-22 15:48:42', 'accepted'),
-(7, 17, 13, '2026-03-22 15:49:22', 'rejected'),
-(8, 16, 9, '2026-03-22 15:49:24', 'rejected'),
-(9, 17, 9, '2026-03-22 16:04:30', 'accepted'),
-(10, 17, 2, '2026-03-22 16:06:21', 'rejected'),
-(11, 16, 13, '2026-03-23 16:36:43', 'accepted'),
-(12, 18, 1, '2026-03-23 17:35:28', 'accepted'),
-(13, 20, 14, '2026-03-23 22:05:06', 'accepted'),
-(14, 21, 9, '2026-03-23 22:06:48', 'accepted'),
-(15, 27, 43, '2026-04-15 22:55:44', 'rejected');
-
 -- --------------------------------------------------------
 
 --
 -- Tábla szerkezet ehhez a táblához `notifications`
 --
 
+DROP TABLE IF EXISTS `notifications`;
 CREATE TABLE `notifications` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
@@ -207,7 +171,23 @@ INSERT INTO `notifications` (`id`, `user_id`, `type`, `title`, `message`, `relat
 (8, 1, 'offer_accepted', 'Your Offer Was Accepted!', 'Your offer was accepted! You received Lada 2107 in exchange for your Honda Integra Type R', 13, 1, '2026-03-23 22:05:39'),
 (9, 2, 'incoming_offer', 'New Offer Received!', 'asd offered their Audi RS7 for your Abarth 595', 14, 1, '2026-03-23 22:06:48'),
 (10, 1, 'offer_accepted', 'Your Offer Was Accepted!', 'Your offer was accepted! You received Abarth 595 in exchange for your Audi RS7', 14, 0, '2026-03-23 22:07:24'),
-(11, 5, 'incoming_offer', 'New Offer Received!', 'fasz offered their BMW M5 Competition (F90) for your BMW 530d (E60)', 15, 0, '2026-04-15 22:55:44');
+(11, 5, 'incoming_offer', 'New Offer Received!', 'fasz offered their BMW M5 Competition (F90) for your BMW 530d (E60)', 15, 0, '2026-04-15 22:55:44'),
+(17, 8, 'offer_accepted', 'Your Offer Was Accepted!', 'Your offer was accepted! You received Honda Civic 5gen in exchange for your Porsche Cayanne S', 17, 1, '2026-04-17 07:03:34'),
+(23, 8, 'offer_accepted', 'Your Offer Was Accepted!', 'Your offer was accepted! You received BMW M5 Competition (F90) in exchange for your Mercedes AMG GT', 20, 1, '2026-04-17 07:05:42'),
+(26, 8, 'incoming_offer', 'New Offer Received!', 'fasz offered their Toyota Supra MK4 for your Lamborghini Gallardo', 23, 1, '2026-04-17 07:06:25'),
+(35, 11, 'offer_accepted', 'Your Offer Was Accepted!', 'Your offer was accepted! You received Porsche Cayanne S in exchange for your BMW M4 Competition (F32)', 26, 0, '2026-04-19 15:09:18'),
+(38, 5, 'incoming_offer', 'New Offer Received!', 'fasz offered their Ford Focus RS for your Toyota Supra MK4', 29, 0, '2026-04-19 15:28:18'),
+(41, 5, 'incoming_offer', 'New Offer Received!', 'z offered their Ford Focus RS for your BMW 530d (E60)', 32, 0, '2026-04-20 09:04:32'),
+(56, 29, 'incoming_offer', 'New Offer Received!', 'teszt offered their Opel Calibra for your Ford Focus RS', 44, 1, '2026-04-28 07:05:06'),
+(59, 32, 'offer_accepted', 'Your Offer Was Accepted!', 'Your offer was accepted! You received Ford Focus RS in exchange for your Opel Calibra', 44, 1, '2026-04-28 07:39:55'),
+(62, 29, 'incoming_offer', 'New Offer Received!', 'teszt offered their Ford Focus RS for your Opel Calibra', 47, 1, '2026-04-28 07:40:40'),
+(65, 29, 'incoming_offer', 'New Offer Received!', 'teszt offered their Ford Focus RS for your BMW M4 Competition (F32)', 50, 1, '2026-04-28 07:52:35'),
+(68, 29, 'incoming_offer', 'New Offer Received!', 'teszt offered their Ford Focus RS for your BMW M4 Competition (F32)', 53, 1, '2026-04-28 07:52:45'),
+(71, 32, 'offer_accepted', 'Your Offer Was Accepted!', 'Your offer was accepted! You received BMW M4 Competition (F32) in exchange for your Ford Focus RS', 53, 1, '2026-04-28 07:52:57'),
+(74, 32, 'incoming_offer', 'New Offer Received!', 'gyula1 offered their BMW M5 Competition (F90) for your Dodge Challenger', 56, 1, '2026-04-28 08:14:13'),
+(77, 29, 'offer_rejected', 'Your Offer Was Rejected', 'Your offer for Dodge Challenger was rejected.', 56, 1, '2026-04-28 08:14:21'),
+(80, 29, 'incoming_offer', 'New Offer Received!', 'teszt offered their Dodge Challenger for your Mercedes G63 AMG', 59, 1, '2026-04-28 08:14:57'),
+(83, 32, 'offer_rejected', 'Your Offer Was Rejected', 'Your offer for Mercedes G63 AMG was rejected.', 59, 1, '2026-04-28 08:15:11');
 
 -- --------------------------------------------------------
 
@@ -215,6 +195,7 @@ INSERT INTO `notifications` (`id`, `user_id`, `type`, `title`, `message`, `relat
 -- Tábla szerkezet ehhez a táblához `users`
 --
 
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int(10) UNSIGNED NOT NULL,
   `email` varchar(255) NOT NULL,
@@ -227,11 +208,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `password`, `username`) VALUES
-(1, 'asd@gmail.com', '$2b$10$if/KopH2G0QBzjyUpXL1Mej4UPVo6buUWXSqcHLRFI5wYjICzkK8e', 'asd'),
-(2, 'ati@gmail.com', '$2b$10$81AU732.knnC60IWzwI9g.ED2WMLWRncy6RG8bS.uvHwSaxXiTtJS', 'ati'),
-(3, 'en@gmail.com', '$2b$10$2Ic/ODTWwY7Q40kmoQV0WegTvGr51pQsbIxZaER.A6/nc9jqVMNKu', 'en'),
-(5, 'asdd@gmail.com', '$2b$10$Rkjt4iL2m96Px3tbO/mKw.eLKbAMpI9t58nc67RDFj7sTqiZz2h9i', 'asdd'),
-(6, 'fasz@gmail.com', '$2b$10$QtHR1l9rikvetz2HxDxMie6GvF6qjrUDI6wqF4CZXqvahrcS9gvMO', 'fasz');
+(32, 'teszt@gmail.com', '$2b$10$Qh1/2kM4g7E2ifmtZO5txO9x5jtguLoDJ438l6HRhT27bpSjhY4pi', 'teszt');
 
 -- --------------------------------------------------------
 
@@ -239,6 +216,7 @@ INSERT INTO `users` (`id`, `email`, `password`, `username`) VALUES
 -- Tábla szerkezet ehhez a táblához `user_cards`
 --
 
+DROP TABLE IF EXISTS `user_cards`;
 CREATE TABLE `user_cards` (
   `id` int(11) NOT NULL,
   `user_id` int(10) UNSIGNED NOT NULL,
@@ -251,39 +229,8 @@ CREATE TABLE `user_cards` (
 --
 
 INSERT INTO `user_cards` (`id`, `user_id`, `card_id`, `acquired_at`) VALUES
-(1, 1, 36, '2026-03-17 14:52:12'),
-(2, 1, 35, '2026-03-17 14:52:13'),
-(3, 1, 25, '2026-03-17 14:52:15'),
-(4, 1, 41, '2026-03-17 14:57:22'),
-(5, 1, 18, '2026-03-17 22:11:04'),
-(6, 1, 41, '2026-03-17 22:11:05'),
-(7, 1, 42, '2026-03-17 22:11:07'),
-(8, 1, 39, '2026-03-17 22:11:08'),
-(9, 2, 38, '2026-03-17 22:11:58'),
-(10, 3, 18, '2026-03-17 22:12:22'),
-(11, 3, 39, '2026-03-17 22:12:23'),
-(12, 3, 5, '2026-03-17 22:12:24'),
-(13, 2, 32, '2026-03-19 19:40:14'),
-(14, 2, 17, '2026-03-19 19:40:17'),
-(15, 1, 21, '2026-03-22 15:39:41'),
-(16, 1, 19, '2026-03-23 16:36:16'),
-(17, 1, 41, '2026-03-23 17:34:30'),
-(18, 1, 10, '2026-03-23 17:34:36'),
-(19, 1, 45, '2026-03-23 22:04:07'),
-(20, 2, 41, '2026-03-23 22:04:09'),
-(31, 5, 43, '2026-04-15 22:22:43'),
-(32, 5, 46, '2026-04-15 22:22:45'),
-(33, 5, 16, '2026-04-15 22:22:47'),
-(34, 5, 7, '2026-04-15 22:39:07'),
-(35, 5, 8, '2026-04-15 22:39:09'),
-(36, 5, 6, '2026-04-15 22:39:10'),
-(37, 5, 30, '2026-04-15 22:39:11'),
-(38, 5, 17, '2026-04-15 22:39:14'),
-(39, 5, 21, '2026-04-15 22:39:17'),
-(40, 5, 18, '2026-04-15 22:39:18'),
-(41, 6, 24, '2026-04-15 22:55:15'),
-(42, 6, 39, '2026-04-15 22:55:17'),
-(43, 6, 24, '2026-04-15 22:55:19');
+(173, 32, 23, '2026-04-28 06:44:13'),
+(182, 32, 40, '2026-04-28 07:54:46');
 
 -- --------------------------------------------------------
 
@@ -291,6 +238,7 @@ INSERT INTO `user_cards` (`id`, `user_id`, `card_id`, `acquired_at`) VALUES
 -- Tábla szerkezet ehhez a táblához `user_packs`
 --
 
+DROP TABLE IF EXISTS `user_packs`;
 CREATE TABLE `user_packs` (
   `id` int(11) NOT NULL,
   `user_id` int(10) UNSIGNED NOT NULL,
@@ -302,23 +250,14 @@ CREATE TABLE `user_packs` (
 --
 
 INSERT INTO `user_packs` (`id`, `user_id`, `acquired_at`) VALUES
-(18, 2, '2026-03-17 22:10:52'),
-(19, 2, '2026-03-17 22:10:52'),
-(20, 2, '2026-03-17 22:10:52'),
-(24, 3, '2026-03-17 22:12:12'),
-(25, 3, '2026-03-17 22:12:12'),
-(26, 3, '2026-03-17 22:12:12'),
-(27, 3, '2026-03-17 22:12:12'),
-(28, 3, '2026-03-17 22:12:12'),
-(29, 3, '2026-03-17 22:12:12'),
-(30, 3, '2026-03-17 22:12:12'),
-(54, 6, '2026-04-15 22:55:05'),
-(55, 6, '2026-04-15 22:55:05'),
-(56, 6, '2026-04-15 22:55:05'),
-(57, 6, '2026-04-15 22:55:05'),
-(58, 6, '2026-04-15 22:55:05'),
-(59, 6, '2026-04-15 22:55:05'),
-(60, 6, '2026-04-15 22:55:05');
+(278, 32, '2026-04-28 07:04:49'),
+(281, 32, '2026-04-28 07:04:49'),
+(284, 32, '2026-04-28 07:04:49'),
+(287, 32, '2026-04-28 07:04:49'),
+(290, 32, '2026-04-28 07:04:49'),
+(293, 32, '2026-04-28 07:04:49'),
+(296, 32, '2026-04-28 07:04:49'),
+(299, 32, '2026-04-28 07:04:49');
 
 --
 -- Indexek a kiírt táblákhoz
@@ -391,37 +330,37 @@ ALTER TABLE `cards`
 -- AUTO_INCREMENT a táblához `market_listings`
 --
 ALTER TABLE `market_listings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT a táblához `market_offers`
 --
 ALTER TABLE `market_offers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT a táblához `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
 
 --
 -- AUTO_INCREMENT a táblához `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT a táblához `user_cards`
 --
 ALTER TABLE `user_cards`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=185;
 
 --
 -- AUTO_INCREMENT a táblához `user_packs`
 --
 ALTER TABLE `user_packs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=302;
 
 --
 -- Megkötések a kiírt táblákhoz
@@ -431,27 +370,27 @@ ALTER TABLE `user_packs`
 -- Megkötések a táblához `market_listings`
 --
 ALTER TABLE `market_listings`
-  ADD CONSTRAINT `market_listings_user_card_id_foreign` FOREIGN KEY (`user_card_id`) REFERENCES `user_cards` (`id`);
+  ADD CONSTRAINT `market_listings_user_card_id_foreign` FOREIGN KEY (`user_card_id`) REFERENCES `user_cards` (`id`) ON DELETE CASCADE;
 
 --
 -- Megkötések a táblához `market_offers`
 --
 ALTER TABLE `market_offers`
-  ADD CONSTRAINT `market_offers_listing_id_foreign` FOREIGN KEY (`listing_id`) REFERENCES `market_listings` (`id`),
-  ADD CONSTRAINT `market_offers_offered_user_card_id_foreign` FOREIGN KEY (`offered_user_card_id`) REFERENCES `user_cards` (`id`);
+  ADD CONSTRAINT `market_offers_listing_id_foreign` FOREIGN KEY (`listing_id`) REFERENCES `market_listings` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `market_offers_offered_user_card_id_foreign` FOREIGN KEY (`offered_user_card_id`) REFERENCES `user_cards` (`id`) ON DELETE CASCADE;
 
 --
 -- Megkötések a táblához `user_cards`
 --
 ALTER TABLE `user_cards`
-  ADD CONSTRAINT `user_cards_card_id_foreign` FOREIGN KEY (`card_id`) REFERENCES `cards` (`id`),
-  ADD CONSTRAINT `user_cards_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `user_cards_card_id_foreign` FOREIGN KEY (`card_id`) REFERENCES `cards` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `user_cards_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Megkötések a táblához `user_packs`
 --
 ALTER TABLE `user_packs`
-  ADD CONSTRAINT `user_packs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `user_packs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
