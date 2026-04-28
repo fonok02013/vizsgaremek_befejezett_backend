@@ -214,8 +214,8 @@ Az index.js -ben implementáltuk a frontend számára összes szükséges végpo
 
 
 ## Frontend
+- [Github repo](https://github.com/fonok02013/vizsgaremek_befejezett)
 
-- [Github repo](https://github.com/poszasz/frontend_vizsga)
 
 ## Használt eszközök
 - [VS code](https://code.visualstudio.com)
